@@ -22,18 +22,17 @@ OpenStack - Helper functions
 
 # Imports #####################################################################
 
-import requests
-
-from novaclient.client import Client as NovaClient
+import logging
 
 from django.conf import settings
+from novaclient.client import Client as NovaClient
+import requests
 
 from instance.utils import get_requests_retry
 
 
 # Logging #####################################################################
 
-import logging
 logger = logging.getLogger(__name__)
 
 

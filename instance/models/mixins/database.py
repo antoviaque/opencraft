@@ -37,7 +37,7 @@ class MySQLInstanceMixin(models.Model):
         abstract = True
 
     @property
-    def mysql_database_names(self):  # pylint: disable=no-self-use
+    def mysql_database_names(self):
         """
         An iterable of database names
         """
@@ -80,7 +80,7 @@ class MongoDBInstanceMixin(models.Model):
         abstract = True
 
     @property
-    def mongo_database_names(self): # pylint: disable=no-self-use
+    def mongo_database_names(self):
         """
         An iterable of database names
         """
