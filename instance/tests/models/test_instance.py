@@ -91,6 +91,9 @@ def patch_services(func):
                 ),
                 mock_provision_mysql=stack_patch('instance.models.instance.MySQLInstanceMixin.provision_mysql'),
                 mock_provision_mongo=stack_patch('instance.models.instance.MongoDBInstanceMixin.provision_mongo'),
+                mock_provision_swift=stack_patch(
+                    'instance.models.instance.SwiftContainerInstanceMixin.provision_swift'
+                ),
             )
             return func(self, mocks, *args, **kwargs)
     return wrapper
@@ -553,6 +556,50 @@ class MongoDBInstanceTestCase(TestCase):
         self.assertEqual(instance.mongo_user, mongo_user)
         self.assertEqual(instance.mongo_pass, mongo_pass)
         self.check_mongo(instance)
+
+
+@patch('instance.openstack.SwiftConnection')
+class SwiftContainerInstanceTestCase(TestCase):
+    """
+    Tests for Swift container provisioning.
+    """
+    def check_swift(self, instance, mock_swift_connection):
+        """
+        Verify Swift settings on the instance and the number of calls to the Swift API.
+        """
+        self.assertIs(instance.swift_provisioned, True)
+        self.assertEqual(instance.swift_openstack_user, settings.SWIFT_OPENSTACK_USER)
+        self.assertEqual(instance.swift_openstack_password, settings.SWIFT_OPENSTACK_PASSWORD)
+        self.assertEqual(instance.swift_openstack_tenant, settings.SWIFT_OPENSTACK_TENANT)
+        self.assertEqual(instance.swift_openstack_auth_url, settings.SWIFT_OPENSTACK_AUTH_URL)
+        self.assertEqual(instance.swift_openstack_region, settings.SWIFT_OPENSTACK_REGION)
+        self.assertCountEqual(
+            [call(c, headers={'X-Container-Read': '.r:*'}) for c in instance.swift_container_names],
+            mock_swift_connection.return_value.put_container.call_args_list,
+        )
+
+    def test_provision_swift(self, mock_swift_connection):
+        """
+        Test provisioning Swift containers, and that they are provisioned only once.
+        """
+        instance = OpenEdXInstanceFactory(use_ephemeral_databases=False)
+        instance.provision_swift()
+        self.check_swift(instance, mock_swift_connection)
+
+        # Provision again without resetting the mock.  The assertCountEqual assertion will verify
+        # that the container isn't provisioned again.
+        instance.provision_swift()
+        self.check_swift(instance, mock_swift_connection)
+
+    @override_settings(SWIFT_ENABLE=False)
+    def test_swift_disabled(self, mock_swift_connection):
+        """
+        Verify disabling Swift provisioning works.
+        """
+        instance = OpenEdXInstanceFactory(use_ephemeral_databases=False)
+        instance.provision_swift()
+        self.assertIs(instance.swift_provisioned, False)
+        self.assertFalse(mock_swift_connection.called)
 
 
 class EmailMixinInstanceTestCase(TestCase):

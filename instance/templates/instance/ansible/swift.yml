@@ -1,0 +1,6 @@
+EDXAPP_SWIFT_AUTH_VERSION: '2'
+EDXAPP_SWIFT_USERNAME: '{{ user }}'
+EDXAPP_SWIFT_KEY: '{{ password }}'
+EDXAPP_SWIFT_TENANT_NAME: '{{ tenant }}'
+EDXAPP_SWIFT_AUTH_URL: '{{ auth_url }}'
+EDXAPP_SWIFT_REGION_NAME: '{{ region }}'
