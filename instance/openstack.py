@@ -99,17 +99,16 @@ def get_server_public_address(server):
     return first_address
 
 
-def create_swift_container(
-        container_name,
+def get_swift_connection(
         user=settings.SWIFT_OPENSTACK_USER,
         password=settings.SWIFT_OPENSTACK_PASSWORD,
         tenant=settings.SWIFT_OPENSTACK_TENANT,
         auth_url=settings.SWIFT_OPENSTACK_AUTH_URL,
         region=settings.SWIFT_OPENSTACK_REGION):
     """
-    Create a Swift container with publicly readable objects (given the URL).
+    Create a new Swift client connection.
     """
-    connection = SwiftConnection(
+    return SwiftConnection(
         auth_version='2',
         user=user,
         key=password,
@@ -117,6 +116,13 @@ def create_swift_container(
         authurl=auth_url,
         os_options=dict(region_name=region),
     )
+
+
+def create_swift_container(container_name, **kwargs):
+    """
+    Create a Swift container with publicly readable objects (given the URL).
+    """
+    connection = get_swift_connection(**kwargs)
     connection.put_container(
         container_name,
         headers={'X-Container-Read': '.r:*'},  # Allow public read access given the URL.

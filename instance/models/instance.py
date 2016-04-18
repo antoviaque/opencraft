@@ -471,9 +471,11 @@ class OpenEdXInstance(MySQLInstanceMixin, MongoDBInstanceMixin, SwiftContainerIn
 
             # Provisioning (external databases)
             if not self.use_ephemeral_databases:
-                self.logger.info('Provisioning external databases...')
+                self.logger.info('Provisioning MySQL database...')
                 self.provision_mysql()
+                self.logger.info('Provisioning MongoDB databases...')
                 self.provision_mongo()
+                self.logger.info('Provisioning Swift container...')
                 self.provision_swift()
 
             # Provisioning (ansible)

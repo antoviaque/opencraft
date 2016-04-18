@@ -137,5 +137,5 @@ class SwiftContainerInstanceMixin(models.Model):
                     auth_url=self.swift_openstack_auth_url,
                     region=self.swift_openstack_region,
                 )
-                self.swift_provisioned = True
-                self.save()
+            self.swift_provisioned = True
+            self.save()
