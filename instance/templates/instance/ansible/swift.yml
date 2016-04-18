@@ -1,3 +1,5 @@
+# The following line is commented out until the openstack role has been merged upstream.
+# EDXAPP_DEFAULT_FILE_STORAGE: 'swift.storage.SwiftStorage'
 EDXAPP_SWIFT_AUTH_VERSION: '2'
 EDXAPP_SWIFT_USERNAME: '{{ user }}'
 EDXAPP_SWIFT_KEY: '{{ password }}'
