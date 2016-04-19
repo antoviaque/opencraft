@@ -23,6 +23,7 @@ Models for the Instance Manager beta test
 # Imports #####################################################################
 
 from django.contrib.auth.models import User
+from django.core import validators
 from django.db import models
 
 
@@ -46,11 +47,20 @@ class BetaTestApplication(models.Model):
     user = models.OneToOneField(User)
     subdomain = models.CharField(
         max_length=255,
+        unique=True,
         verbose_name='domain name',
         help_text=('The URL students will visit. In the future, you will also '
                    'have the possibility to use your own domain name.'
                    '\n\nExample: hogwarts.{0}').format(BASE_DOMAIN),
-        unique=True,
+        validators=[
+            validators.RegexValidator(
+                r'^[\w.]+$',
+                'Please include only letters, numbers, and the . character.',
+            ),
+        ],
+        error_messages={
+            'unique': 'This domain is already taken.',
+        },
     )
     instance_name = models.CharField(
         max_length=255,
@@ -70,6 +80,7 @@ class BetaTestApplication(models.Model):
     )
     subscribe_to_updates = models.BooleanField(
         default=False,
+        verbose_name='',
         help_text=('I want OpenCraft to keep me updated about the progress '
                    'of the beta test, and send me an email occasionally '
                    'about it.'),

@@ -17,24 +17,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 """
-Global URL Patterns
+Beta test views
 """
 
 # Imports #####################################################################
 
-from django.conf.urls import include, url
-from django.contrib import admin
-from django.views.generic.base import RedirectView
+from django.views.generic.edit import CreateView
+
+from betatest.forms import BetaTestApplicationForm
 
 
-# URL Patterns ################################################################
+# Views #######################################################################
 
-urlpatterns = [
-    url(r'^grappelli/', include('grappelli.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^api/', include('api.urls', namespace="api")),
-    url(r'^instance/', include('instance.urls', namespace="instance")),
-    url(r'^beta/', include('betatest.urls', namespace='beta')),
-    url(r'^favicon\.ico$', RedirectView.as_view(url='/static/img/favicon/favicon.ico', permanent=False)),
-    url(r'^$', 'instance.views.index'),
-]
+class BetaTestApplicationView(CreateView):
+    """
+    Display the beta test application form.
+    """
+    template_name = 'betatest/application.html'
+    form_class = BetaTestApplicationForm
