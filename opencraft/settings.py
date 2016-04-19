@@ -63,6 +63,7 @@ LOCAL_APPS = (
     'api',
     'instance',
     'userprofile',
+    'betatest',
 )
 
 INSTALLED_APPS = (
