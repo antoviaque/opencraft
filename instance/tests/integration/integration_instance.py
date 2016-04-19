@@ -28,11 +28,11 @@ import time
 import requests
 from django.conf import settings
 
-from instance.models.instance import OpenEdXInstance
+from instance.models.instance import SingleVMOpenEdXInstance
 from instance.models.server import Status, Progress
 from instance.tests.decorators import patch_git_checkout
 from instance.tests.integration.base import IntegrationTestCase
-from instance.tests.integration.factories.instance import OpenEdXInstanceFactory
+from instance.tests.integration.factories.instance import SingleVMOpenEdXInstanceFactory
 from instance.tasks import provision_instance
 from opencraft.tests.utils import shard
 
@@ -66,8 +66,8 @@ class InstanceIntegrationTestCase(IntegrationTestCase):
         """
         Provision an instance
         """
-        OpenEdXInstanceFactory(name='Integration - test_provision_instance')
-        instance = OpenEdXInstance.objects.get()
+        SingleVMOpenEdXInstanceFactory(name='Integration - test_provision_instance')
+        instance = SingleVMOpenEdXInstance.objects.get()
         provision_instance(instance.pk)
         self.assert_instance_up(instance)
 
@@ -79,9 +79,9 @@ class InstanceIntegrationTestCase(IntegrationTestCase):
         if not settings.INSTANCE_MYSQL_URL or not settings.INSTANCE_MONGO_URL:
             print('External databases not configured, skipping integration test')
             return
-        OpenEdXInstanceFactory(name='Integration - test_external_databases',
-                               use_ephemeral_databases=False)
-        instance = OpenEdXInstance.objects.get()
+        SingleVMOpenEdXInstanceFactory(name='Integration - test_external_databases',
+                                       use_ephemeral_databases=False)
+        instance = SingleVMOpenEdXInstance.objects.get()
         provision_instance(instance.pk)
         self.assert_instance_up(instance)
 
@@ -92,9 +92,9 @@ class InstanceIntegrationTestCase(IntegrationTestCase):
         """
         git_working_dir.return_value = os.path.join(os.path.dirname(__file__), "ansible")
 
-        OpenEdXInstanceFactory(name='Integration - test_ansible_failure',
-                               ansible_playbook_name='failure')
-        instance = OpenEdXInstance.objects.get()
+        SingleVMOpenEdXInstanceFactory(name='Integration - test_ansible_failure',
+                                       ansible_playbook_name='failure')
+        instance = SingleVMOpenEdXInstance.objects.get()
         provision_instance(instance.pk)
         self.assertEqual(instance.status, Status.Provisioning)
         self.assertEqual(instance.progress, Progress.Failed)
@@ -106,9 +106,9 @@ class InstanceIntegrationTestCase(IntegrationTestCase):
         """
         git_working_dir.return_value = os.path.join(os.path.dirname(__file__), "ansible")
 
-        OpenEdXInstanceFactory(name='Integration - test_ansible_failignore',
-                               ansible_playbook_name='failignore')
-        instance = OpenEdXInstance.objects.get()
+        SingleVMOpenEdXInstanceFactory(name='Integration - test_ansible_failignore',
+                                       ansible_playbook_name='failignore')
+        instance = SingleVMOpenEdXInstance.objects.get()
         provision_instance(instance.pk)
         self.assertEqual(instance.status, Status.Ready)
         self.assertEqual(instance.progress, Progress.Success)

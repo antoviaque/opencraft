@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from django.db import migrations, models
-from instance.models.instance import OpenEdXInstance as OpenEdXInstance
+from instance.models.instance import SingleVMOpenEdXInstance as OpenEdXInstance
 
 
 def reset_ansible_settings(apps, schema_editor):
