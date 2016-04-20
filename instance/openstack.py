@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 def get_nova_client(api_version=2):
     """
-    Instanciate a python novaclient.Client() object with proper credentials
+    Instantiate a python novaclient.Client() object with proper credentials
     """
     nova = NovaClient(
         api_version,

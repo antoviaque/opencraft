@@ -43,7 +43,7 @@ from instance.tests.base import TestCase
 from instance.tests.factories.pr import PRFactory
 from instance.tests.models.factories.instance import SingleVMOpenEdXInstanceFactory
 from instance.tests.models.factories.server import (
-    StartedOpenStackServerFactory, BootedOpenStackServerFactory, ProvisioningOpenStackServerFactory,
+    BuildingOpenStackServerFactory, ReadyOpenStackServerFactory, ProvisioningOpenStackServerFactory,
     patch_os_server, OSServerMockManager)
 
 
@@ -143,21 +143,21 @@ class InstanceTestCase(TestCase):
         instance = SingleVMOpenEdXInstanceFactory()
         self.assertIsNone(instance.server_status)
         self.assertIsNone(instance.progress)
-        server = StartedOpenStackServerFactory(instance=instance)
-        self.assertEqual(instance.server_status, Server.Status.Started)
+        server = BuildingOpenStackServerFactory(instance=instance)
+        self.assertEqual(instance.server_status, Server.Status.Building)
         self.assertEqual(instance.progress, Server.Progress.Running)
-        server._transition(server._status_to_active)
-        self.assertEqual(instance.server_status, Server.Status.Active)
-        server._transition(server._status_to_booted)
-        self.assertEqual(instance.server_status, Server.Status.Booted)
+        server._transition(server._status_to_booting)
+        self.assertEqual(instance.server_status, Server.Status.Booting)
+        server._transition(server._status_to_ready)
+        self.assertEqual(instance.server_status, Server.Status.Ready)
 
     def test_status_terminated(self):
         """
         Instance status should revert to 'empty' when all its servers are terminated
         """
         instance = SingleVMOpenEdXInstanceFactory()
-        server = StartedOpenStackServerFactory(instance=instance)
-        self.assertEqual(instance.server_status, server.Status.Started)
+        server = BuildingOpenStackServerFactory(instance=instance)
+        self.assertEqual(instance.server_status, server.Status.Building)
         server._transition(server._status_to_terminated)
         self.assertIsNone(instance.server_status)
 
@@ -166,10 +166,10 @@ class InstanceTestCase(TestCase):
         Instance status should not allow multiple active servers
         """
         instance = SingleVMOpenEdXInstanceFactory()
-        StartedOpenStackServerFactory(instance=instance)
-        self.assertEqual(instance.server_status, Server.Status.Started)
+        BuildingOpenStackServerFactory(instance=instance)
+        self.assertEqual(instance.server_status, Server.Status.Building)
         self.assertEqual(instance.progress, Server.Progress.Running)
-        StartedOpenStackServerFactory(instance=instance)
+        BuildingOpenStackServerFactory(instance=instance)
         with self.assertRaises(InconsistentInstanceState):
             instance.server_status #pylint: disable=pointless-statement
 
@@ -320,17 +320,17 @@ class AnsibleInstanceTestCase(TestCase):
     @patch_os_server
     def test_inventory_str(self, os_server_manager):
         """
-        Ansible inventory - showing servers once they are in booted status
+        Ansible inventory - showing servers once they are in ready status
         """
         instance = SingleVMOpenEdXInstanceFactory()
         self.assertEqual(instance.inventory_str, '[app]')
 
-        # Server 1: 'started'
-        StartedOpenStackServerFactory(instance=instance)
+        # Server 1: 'building'
+        BuildingOpenStackServerFactory(instance=instance)
         self.assertEqual(instance.inventory_str, '[app]')
 
-        # Server 2: 'booted'
-        server2 = BootedOpenStackServerFactory(instance=instance)
+        # Server 2: 'ready'
+        server2 = ReadyOpenStackServerFactory(instance=instance)
         os_server_manager.add_fixture(server2.openstack_id, 'openstack/api_server_2_active.json')
         self.assertEqual(instance.inventory_str, '[app]')
 
@@ -399,7 +399,7 @@ class AnsibleInstanceTestCase(TestCase):
         Test instance deployment
         """
         instance = SingleVMOpenEdXInstanceFactory()
-        BootedOpenStackServerFactory(instance=instance)
+        ReadyOpenStackServerFactory(instance=instance)
         mock_open_repo.return_value.__enter__.return_value.working_dir = '/cloned/configuration-repo/path'
 
         instance.deploy()
