@@ -358,7 +358,7 @@ class ModelResourceStateDescriptor(ResourceStateDescriptor):
 
         Suitable for passing to a django CharField choices parameter.
         """
-        return tuple((state.state_id, state.__class__.__name__) for state in self.state_classes)
+        return tuple((state.state_id, state.__name__) for state in self.state_classes)
 
     # Internal helper methods:
 
