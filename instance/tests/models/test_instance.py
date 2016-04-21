@@ -37,7 +37,7 @@ from django.test import override_settings
 import pymongo
 import yaml
 
-from instance.models.server import Server, Progress as ServerProgress
+from instance.models.server import Server
 from instance.models.instance import InconsistentInstanceState, Instance, SingleVMOpenEdXInstance
 from instance.tests.base import TestCase
 from instance.tests.factories.pr import PRFactory
@@ -143,10 +143,8 @@ class InstanceTestCase(TestCase):
         """
         instance = SingleVMOpenEdXInstanceFactory()
         self.assertIsNone(instance.server_status)
-        self.assertIsNone(instance.progress)
         server = BuildingOpenStackServerFactory(instance=instance)
         self.assertEqual(instance.server_status, Server.Status.Building)
-        self.assertEqual(instance.progress, Server.Progress.Running)
         server._transition(server._status_to_booting)
         self.assertEqual(instance.server_status, Server.Status.Booting)
         server._transition(server._status_to_ready)
@@ -169,7 +167,6 @@ class InstanceTestCase(TestCase):
         instance = SingleVMOpenEdXInstanceFactory()
         BuildingOpenStackServerFactory(instance=instance)
         self.assertEqual(instance.server_status, Server.Status.Building)
-        self.assertEqual(instance.progress, Server.Progress.Running)
         BuildingOpenStackServerFactory(instance=instance)
         with self.assertRaises(InconsistentInstanceState):
             instance.server_status #pylint: disable=pointless-statement
@@ -336,18 +333,12 @@ class AnsibleInstanceTestCase(TestCase):
         self.assertEqual(instance.inventory_str, '[app]')
 
         # Server 3: 'ready'
-        server3 = ReadyOpenStackServerFactory(
-            instance=instance,
-            _progress=ServerProgress.Success.state_id
-        )
+        server3 = ReadyOpenStackServerFactory(instance=instance)
         os_server_manager.add_fixture(server3.openstack_id, 'openstack/api_server_2_active.json')
         self.assertEqual(instance.inventory_str, '[app]\n192.168.100.200')
 
         # Server 4: 'ready'
-        server4 = ReadyOpenStackServerFactory(
-            instance=instance,
-            _progress=ServerProgress.Success.state_id
-        )
+        server4 = ReadyOpenStackServerFactory(instance=instance)
         os_server_manager.add_fixture(server4.openstack_id, 'openstack/api_server_3_active.json')
         self.assertEqual(instance.inventory_str, '[app]\n192.168.100.200\n192.168.99.66')
 
