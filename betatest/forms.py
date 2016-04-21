@@ -29,6 +29,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils.text import capfirst
 from djng.forms import NgFormValidationMixin, NgModelForm, NgModelFormMixin
+from zxcvbn import password_strength
 
 from betatest.models import BetaTestApplication
 from userprofile.models import UserProfile
@@ -142,6 +143,18 @@ class BetaTestApplicationForm(NgModelFormMixin, NgFormValidationMixin, NgModelFo
                 code='unique',
             )
         return username
+
+    def clean_password(self):
+        """
+        Check password strength.
+        """
+        password = self.cleaned_data.get('password')
+        if password and password_strength(password)['score'] < 2:
+            raise forms.ValidationError(
+                'Please use a stronger password.',
+                code='invalid',
+            )
+        return password
 
     def clean_password_confirmation(self):
         """

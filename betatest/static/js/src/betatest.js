@@ -62,6 +62,15 @@ app.controller('Registration', function($scope, $http, $window, djangoForm) {
         }
     });
 
+    // Check that the password is strong enough.
+    $scope.$watch('registration.password', function(password) {
+        if (password && zxcvbn(password).score < 2) {
+            djangoForm.setErrors($scope.form, {
+                'password': ['Please use a stronger password.']
+            });
+        }
+    });
+
 });
 
 })();

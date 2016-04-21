@@ -25,7 +25,7 @@ CDNJS = https://cdnjs.cloudflare.com/ajax/libs
 
 all: angular.min.js angular.min.js.map angular-mocks.js angular-route.min.js angular-route.min.js.map \
 	 angular-ui-router.min.js jquery.min.js jshint.js restangular.min.js underscore-min.js \
-	 underscore-min.map
+	 underscore-min.map zxcvbn.js zxcvbn.js.map
 
 angular.min.js:
 	$(GET) $@ $(CDNJS)/angular.js/1.4.6/angular.min.js
@@ -59,3 +59,9 @@ underscore-min.js:
 
 underscore-min.map:
 	$(GET) $@ $(CDNJS)/underscore.js/1.8.3/underscore-min.map
+
+zxcvbn.js:
+	$(GET) $@ $(CDNJS)/zxcvbn/4.3.0/zxcvbn.js
+
+zxcvbn.js.map:
+	$(GET) $@ $(CDNJS)/zxcvbn/4.3.0/zxcvbn.js.map
