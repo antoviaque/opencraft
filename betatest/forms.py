@@ -28,7 +28,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils.text import capfirst
-from djng.forms import NgFormValidationMixin, NgModelForm
+from djng.forms import NgFormValidationMixin, NgModelForm, NgModelFormMixin
 
 from betatest.models import BetaTestApplication
 from userprofile.models import UserProfile
@@ -36,7 +36,7 @@ from userprofile.models import UserProfile
 
 # Forms #######################################################################
 
-class BetaTestApplicationForm(NgFormValidationMixin, NgModelForm):
+class BetaTestApplicationForm(NgModelFormMixin, NgFormValidationMixin, NgModelForm):
     """
     Application form for beta testers. Creates User, UserProfile, and
     BetaTestApplication models.
@@ -114,6 +114,12 @@ class BetaTestApplicationForm(NgFormValidationMixin, NgModelForm):
             'invalid': _subdomain_validator.message,
         },
     )
+
+    # Form values will be available in the angular scope under this namespace
+    scope_prefix = 'registration'
+
+    # This form itself will be available in the angular scope under this name
+    form_name = 'form'
 
     def __init__(self, *args, **kwargs):
         """

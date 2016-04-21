@@ -17,6 +17,36 @@
 (function(){
 "use strict";
 
-angular.module('BetaTestApp', ['djng.forms']);
+// App configuration //////////////////////////////////////////////////////////
+
+var app = angular.module('BetaTestApp', ['djng.forms']);
+
+app.config(function($httpProvider) {
+    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+});
+
+
+// Controllers ////////////////////////////////////////////////////////////////
+
+app.controller('Registration', function($scope, $http, $window, djangoForm) {
+
+    // Validate the registration form on the server
+    $scope.validate = _.debounce(function() {
+        $http.post('/beta/api/register/validate/', $scope.registration).success(function(errors) {
+            djangoForm.setErrors($scope.form, errors);
+        }).error(function() {
+            console.error('Failed to validate form');
+        });
+    }, 500);
+
+    // Trigger server-side validation when the user selects a username, to
+    // ensure that the username is not already taken
+    $scope.$watch('registration.username', function(username) {
+        $scope.validate();
+    });
+
+});
 
 })();

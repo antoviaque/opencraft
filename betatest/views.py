@@ -23,6 +23,9 @@ Beta test views
 # Imports #####################################################################
 
 from django.views.generic.edit import CreateView
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 from betatest.forms import BetaTestApplicationForm
 
@@ -35,3 +38,13 @@ class BetaTestApplicationView(CreateView):
     """
     template_name = 'betatest/application.html'
     form_class = BetaTestApplicationForm
+
+
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def validate_registration(request):
+    """
+    Validate the given form input, and return any errors as json.
+    """
+    form = BetaTestApplicationForm(request.data)
+    return Response(form.errors)

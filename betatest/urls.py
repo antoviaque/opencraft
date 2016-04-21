@@ -31,4 +31,5 @@ from betatest import views
 
 urlpatterns = [
     url(r'^register/$', views.BetaTestApplicationView.as_view(), name='register'),
+    url(r'^api/register/validate/$', views.validate_registration, name='validate'),
 ]

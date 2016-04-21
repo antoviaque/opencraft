@@ -22,7 +22,7 @@
             <p>This is the application form for the beta of the self-service
             hosting offered by OpenCraft. For enterprise or institutional
             offerings, contact us.</p>
-            <form name="{{ form.form_name }}" action="" method="post" novalidate>
+            <form name="{{ form.form_name }}" action="" method="post" ng-controller="Registration" novalidate>
                 {% csrf_token %}
                 {{ form }}
                 <button ng-disabled="{{ form.form_name }}.$invalid">Apply for the beta test</button>
