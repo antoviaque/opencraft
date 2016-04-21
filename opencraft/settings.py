@@ -77,7 +77,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'foundation',
     'compressor',
-    'djangular',
+    'djng',
     'rest_framework',
     'huey.djhuey',
     'swampdragon',

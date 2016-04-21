@@ -28,7 +28,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils.text import capfirst
-from djangular.forms import NgFormValidationMixin, NgModelForm
+from djng.forms import NgFormValidationMixin, NgModelForm
 
 from betatest.models import BetaTestApplication
 from userprofile.models import UserProfile

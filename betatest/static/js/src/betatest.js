@@ -17,6 +17,6 @@
 (function(){
 "use strict";
 
-angular.module('BetaTestApp', ['ng.django.forms']);
+angular.module('BetaTestApp', ['djng.forms']);
 
 })();
