@@ -144,6 +144,18 @@ class BetaTestApplicationForm(NgModelFormMixin, NgFormValidationMixin, NgModelFo
             )
         return username
 
+    def clean_email(self):
+        """
+        Check that the email address is unique.
+        """
+        email = self.cleaned_data.get('email')
+        if email and User.objects.filter(email=email).exists():
+            raise forms.ValidationError(
+                'This email address is already registered.',
+                code='unique',
+            )
+        return email
+
     def clean_password(self):
         """
         Check password strength.

@@ -34,7 +34,7 @@ app.controller('Registration', function($scope, $http, $window, djangoForm) {
 
     // Validate the registration form on the server. If an array of fields is
     // given, error messages will only be displayed for those fields.
-    $scope.validate = _.debounce(function(fields) {
+    $scope.validate = function(fields) {
         $http.post('/beta/api/register/validate/', $scope.registration).success(function(errors) {
             if (fields != null) {
                 errors = _.pick(errors, fields);
@@ -43,14 +43,16 @@ app.controller('Registration', function($scope, $http, $window, djangoForm) {
         }).error(function() {
             console.error('Failed to validate form');
         });
-    }, 500);
+    };
 
-    // Trigger server-side validation when the user selects a username, to
-    // ensure that the username is not already taken.
-    $scope.$watch('registration.username', function(username) {
-        if ($scope.form.$dirty) {
-            $scope.validate(['username']);
-        }
+    // Trigger server-side validation when the user types in a username, email
+    // address, or subdomain, to ensure that they are not already taken.
+    ['username', 'email', 'subdomain'].forEach(function(field) {
+        $scope.$watch('registration.' + field, _.debounce(function() {
+            if ($scope.form.$dirty) {
+                $scope.validate([field]);
+            }
+        }, 500));
     });
 
     // Check that passwords match.
