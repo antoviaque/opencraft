@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+# pylint: disable=too-many-lines
 """
 OpenEdXInstance model - Tests
 """
@@ -725,6 +726,11 @@ class OpenEdXInstanceTestCase(TestCase):
         self.assertFalse(instance.mysql_pass)
         self.assertFalse(instance.mongo_user)
         self.assertFalse(instance.mongo_pass)
+        self.assertFalse(instance.swift_openstack_user)
+        self.assertFalse(instance.swift_openstack_password)
+        self.assertFalse(instance.swift_openstack_tenant)
+        self.assertFalse(instance.swift_openstack_auth_url)
+        self.assertFalse(instance.swift_openstack_region)
 
     @override_settings(INSTANCE_EPHEMERAL_DATABASES=True)
     @patch('instance.models.mixins.version_control.github.get_commit_id_from_ref')
@@ -892,6 +898,46 @@ class OpenEdXInstanceTestCase(TestCase):
                     'FORUM_MONGO_DATABASE'):
             self.assertNotIn(var, instance.ansible_settings)
 
+    def check_ansible_settings(self, instance, expected=True):
+        """
+        Verify the Ansible settings.
+        """
+        instance.reset_ansible_settings()
+        expected_settings = {
+            'EDXAPP_SWIFT_USERNAME': 'swift_openstack_user',
+            'EDXAPP_SWIFT_KEY': 'swift_openstack_password',
+            'EDXAPP_SWIFT_TENANT_NAME': 'swift_openstack_tenant',
+            'EDXAPP_SWIFT_AUTH_URL': 'swift_openstack_auth_url',
+            'EDXAPP_SWIFT_REGION_NAME': 'swift_openstack_region',
+        }
+        for ansible_var, attribute in expected_settings.items():
+            if expected:
+                self.assertIn('{}: {}'.format(ansible_var, getattr(instance, attribute)), instance.ansible_settings)
+            else:
+                self.assertNotIn(ansible_var, instance.ansible_settings)
+
+    def test_ansible_settings_swift(self):
+        """
+        Verify Swift Ansible configuration when Swift is enabled.
+        """
+        instance = OpenEdXInstanceFactory(use_ephemeral_databases=False)
+        self.check_ansible_settings(instance)
+
+    @override_settings(SWIFT_ENABLE=False)
+    def test_ansible_settings_swift_disabled(self):
+        """
+        Verify Swift Ansible configuration is not included when Swift is disabled.
+        """
+        instance = OpenEdXInstanceFactory(use_ephemeral_databases=False)
+        self.check_ansible_settings(instance, expected=False)
+
+    def test_ansible_settings_swift_ephemeral(self):
+        """
+        Verify Swift Ansible configuration is not included when using ephemeral databases.
+        """
+        instance = OpenEdXInstanceFactory(use_ephemeral_databases=True)
+        self.check_ansible_settings(instance, expected=False)
+
     @patch_services
     def test_provision(self, mocks):
         """
@@ -912,6 +958,7 @@ class OpenEdXInstanceTestCase(TestCase):
         self.assertEqual(mock_reboot.call_count, 1)
         self.assertEqual(mocks.mock_provision_mysql.call_count, 0)
         self.assertEqual(mocks.mock_provision_mongo.call_count, 0)
+        self.assertEqual(mocks.mock_provision_swift.call_count, 0)
 
     @patch_services
     def test_provision_failed(self, mocks):
@@ -959,7 +1006,8 @@ class OpenEdXInstanceTestCase(TestCase):
             """
             ansible_settings = yaml.load(instance.ansible_settings)
             for setting in ('EDXAPP_MYSQL_USER', 'EDXAPP_MONGO_PASSWORD',
-                            'EDXAPP_MONGO_USER', 'EDXAPP_MONGO_PASSWORD'):
+                            'EDXAPP_MONGO_USER', 'EDXAPP_MONGO_PASSWORD',
+                            'EDXAPP_SWIFT_USERNAME', 'EDXAPP_SWIFT_KEY'):
                 self.assertTrue(ansible_settings[setting])
             return (['log'], 0)
 
@@ -967,3 +1015,4 @@ class OpenEdXInstanceTestCase(TestCase):
         instance.provision()
         self.assertEqual(mocks.mock_provision_mysql.call_count, 1)
         self.assertEqual(mocks.mock_provision_mongo.call_count, 1)
+        self.assertEqual(mocks.mock_provision_swift.call_count, 1)
