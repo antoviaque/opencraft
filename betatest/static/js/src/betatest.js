@@ -32,9 +32,13 @@ app.config(function($httpProvider) {
 
 app.controller('Registration', function($scope, $http, $window, djangoForm) {
 
-    // Validate the registration form on the server
-    $scope.validate = _.debounce(function() {
+    // Validate the registration form on the server. If an array of fields is
+    // given, error messages will only be displayed for those fields.
+    $scope.validate = _.debounce(function(fields) {
         $http.post('/beta/api/register/validate/', $scope.registration).success(function(errors) {
+            if (fields != null) {
+                errors = _.pick(errors, fields);
+            }
             djangoForm.setErrors($scope.form, errors);
         }).error(function() {
             console.error('Failed to validate form');
@@ -42,9 +46,20 @@ app.controller('Registration', function($scope, $http, $window, djangoForm) {
     }, 500);
 
     // Trigger server-side validation when the user selects a username, to
-    // ensure that the username is not already taken
+    // ensure that the username is not already taken.
     $scope.$watch('registration.username', function(username) {
-        $scope.validate();
+        if ($scope.form.$dirty) {
+            $scope.validate(['username']);
+        }
+    });
+
+    // Check that passwords match.
+    $scope.$watchGroup(['registration.password', 'registration.password_confirmation'], function(passwords) {
+        if (_.all(passwords) && passwords[0] !== passwords[1]) {
+            djangoForm.setErrors($scope.form, {
+                'password_confirmation': ["The two password fields didn't match."]
+            });
+        }
     });
 
 });
