@@ -22,12 +22,15 @@ Beta test views
 
 # Imports #####################################################################
 
+from django.core.urlresolvers import reverse_lazy
+from django.shortcuts import render
 from django.views.generic.edit import CreateView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from betatest.forms import BetaTestApplicationForm
+from email_verification.models import EmailVerification
 
 
 # Views #######################################################################
@@ -38,6 +41,25 @@ class BetaTestApplicationView(CreateView):
     """
     template_name = 'betatest/application.html'
     form_class = BetaTestApplicationForm
+    success_url = reverse_lazy('beta:success')
+
+    def form_valid(self, form):
+        """
+        If the form is valid, send verification emails for the user's email
+        address and the given public contact email.
+        """
+        response = super().form_valid(form)
+        base_url = self.request.build_absolute_uri('/')
+        EmailVerification.verify(self.object.user.email, base_url)
+        EmailVerification.verify(self.object.public_contact_email, base_url)
+        return response
+
+
+def success(request):
+    """
+    Display a message on successful registration.
+    """
+    return render(request, 'betatest/success.html')
 
 
 @api_view(['POST'])

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Verify email address{% endblock %}
+
+{% block content %}
+<div class="container content">
+    {% if verification.verified %}
+    Thank you for verifying your email address ({{ verification.email }}).
+    {% elif verification.verification_code_expired %}
+    {# TODO: Resend verification email #}
+    Your email verification link has expired.
+    {% else %}
+    Your email address could not be verified - please contact us.
+    {% endif %}
+</div>
+{% endblock content %}

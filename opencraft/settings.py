@@ -62,6 +62,7 @@ DATABASES = {
 LOCAL_APPS = (
     'api',
     'instance',
+    'email_verification',
     'userprofile',
     'betatest',
 )

@@ -29,7 +29,9 @@ from betatest import views
 
 # URL Patterns ################################################################
 
+app_name = 'beta'
 urlpatterns = [
     url(r'^register/$', views.BetaTestApplicationView.as_view(), name='register'),
+    url(r'^success/$', views.success, name='success'),
     url(r'^api/register/validate/$', views.validate_registration, name='validate'),
 ]

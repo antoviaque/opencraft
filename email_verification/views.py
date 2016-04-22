@@ -17,25 +17,27 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 """
-Global URL Patterns
+Views for email verification
 """
 
 # Imports #####################################################################
 
-from django.conf.urls import include, url
-from django.contrib import admin
-from django.views.generic.base import RedirectView
+from django.http import Http404
+from django.shortcuts import render
+
+from email_verification.models import EmailVerification
 
 
-# URL Patterns ################################################################
+# Views #######################################################################
 
-urlpatterns = [
-    url(r'^grappelli/', include('grappelli.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^api/', include('api.urls', namespace="api")),
-    url(r'^instance/', include('instance.urls', namespace="instance")),
-    url(r'^beta/', include('betatest.urls', namespace='beta')),
-    url(r'^email-verification/', include('email_verification.urls', namespace='email-verification')),
-    url(r'^favicon\.ico$', RedirectView.as_view(url='/static/img/favicon/favicon.ico', permanent=False)),
-    url(r'^$', 'instance.views.index'),
-]
+def verify_email(request, code):
+    """
+    Verify the given email address, and display a message to the user.
+    """
+    try:
+        verification = EmailVerification.check_verification_code(code)
+    except EmailVerification.DoesNotExist:
+        raise Http404
+    return render(request, 'email_verification/verify.html', context={
+        'verification': verification,
+    })
