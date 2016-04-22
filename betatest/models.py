@@ -22,7 +22,7 @@ Models for the Instance Manager beta test
 
 # Imports #####################################################################
 
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.core import validators
 from django.db import models
 
@@ -44,7 +44,7 @@ class BetaTestApplication(models.Model):
         (REJECTED, 'Rejected'),
     )
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
     subdomain = models.CharField(
         max_length=255,
         unique=True,
