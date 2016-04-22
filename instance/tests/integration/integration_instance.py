@@ -47,6 +47,7 @@ class InstanceIntegrationTestCase(IntegrationTestCase):
         """
         Check that the given instance is up and accepting requests
         """
+        instance.refresh_from_db()
         self.assertEqual(instance.status, InstanceStatus.Running)
         self.assertEqual(instance.server_status, ServerStatus.Ready)
         server = instance.server_set.first()
@@ -96,6 +97,7 @@ class InstanceIntegrationTestCase(IntegrationTestCase):
                                        ansible_playbook_name='failure')
         instance = SingleVMOpenEdXInstance.objects.get()
         provision_instance(instance.pk)
+        instance.refresh_from_db()
         self.assertEqual(instance.status, InstanceStatus.ConfigurationFailed)
         self.assertEqual(instance.server_status, ServerStatus.Ready)
 
@@ -110,5 +112,6 @@ class InstanceIntegrationTestCase(IntegrationTestCase):
                                        ansible_playbook_name='failignore')
         instance = SingleVMOpenEdXInstance.objects.get()
         provision_instance(instance.pk)
+        instance.refresh_from_db()
         self.assertEqual(instance.status, InstanceStatus.Running)
         self.assertEqual(instance.server_status, ServerStatus.Ready)
