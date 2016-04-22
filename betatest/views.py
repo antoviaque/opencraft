@@ -23,6 +23,7 @@ Beta test views
 # Imports #####################################################################
 
 from django.core.urlresolvers import reverse_lazy
+from django.db import transaction
 from django.shortcuts import render
 from django.views.generic.edit import CreateView
 from rest_framework.decorators import api_view, permission_classes
@@ -43,6 +44,7 @@ class BetaTestApplicationView(CreateView):
     form_class = BetaTestApplicationForm
     success_url = reverse_lazy('beta:success')
 
+    @transaction.atomic
     def form_valid(self, form):
         """
         If the form is valid, send verification emails for the user's email
