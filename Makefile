@@ -51,8 +51,17 @@ clean:
 install_system_db_dependencies: apt_get_update
 	sudo -E apt-get install -y `tr -d '\r' < debian_db_packages.lst`
 
-install_system_dependencies: apt_get_update
+install_system_dependencies: apt_get_update install_geckodriver
 	sudo -E apt-get install -y `tr -d '\r' < debian_packages.lst`
+
+# Selenium dependency for recent versions of Firefox
+install_geckodriver:
+	cd /tmp && rm -rf geckodriver* && \
+	wget https://github.com/mozilla/geckodriver/releases/download/v0.13.0/geckodriver-v0.13.0-linux64.tar.gz && \
+	tar -xvzf geckodriver-v0.13.0-linux64.tar.gz && \
+	rm geckodriver-v0.13.0-linux64.tar.gz && \
+	chmod +x geckodriver && \
+	sudo mv geckodriver /usr/local/bin/
 
 install_virtualenv_system:
 	sudo pip3 install virtualenv
