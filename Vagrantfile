@@ -26,7 +26,7 @@ Vagrant.configure(2) do |config|
                       keep_color: true
 
   config.vm.provider :virtualbox do |vb|
-    vb.memory = 1024
+    vb.memory = 2048
     # Allow DNS to work for Ubuntu host
     # http://askubuntu.com/questions/238040/how-do-i-fix-name-service-for-vagrant-client
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
