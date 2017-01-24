@@ -97,9 +97,10 @@ class BetaTestApplication(ValidateModelMixin, TimeStampedModel):
                    '\n\nThis needs to be a valid email.'),
     )
     project_description = models.TextField(
-        verbose_name='your project',
-        help_text=('What are you going to use the instance for? What are '
-                   'your expectations?'),
+        blank=True,
+        verbose_name='your project & requirements',
+        help_text=('What are you going to use the instance for? Do you '
+                   'have any specific requirements?'),
     )
     subscribe_to_updates = models.BooleanField(
         default=False,
