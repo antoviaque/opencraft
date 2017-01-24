@@ -93,7 +93,7 @@ class BrowserTestMixin:
         submit = self.form.find_element_by_tag_name('button')
         submit.click()
         # Wait for page to start reloading.
-        WebDriverWait(self.client, timeout=3) \
+        WebDriverWait(self.client, timeout=10) \
             .until(expected_conditions.staleness_of(html))
         # Wait for page to finish reloading.
         WebDriverWait(self.client, timeout=20) \
