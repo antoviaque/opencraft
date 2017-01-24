@@ -68,6 +68,11 @@ form .input
 {
     @extend %inputs;
 
+    &.ng-invalid
+    {
+        border-color: red;
+    }
+
     &--contact
     {
         border-color: rgba(map-get($colors, white), 0.2);
