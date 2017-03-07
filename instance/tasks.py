@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 # Tasks #######################################################################
 
 @db_task()
-def spawn_appserver(instance_ref_id, mark_active_on_success=False, num_attempts=1):
+def spawn_appserver(instance_ref_id, mark_active_on_success=False, num_attempts=2):
     """
     Create a new AppServer for an existing instance.
 
