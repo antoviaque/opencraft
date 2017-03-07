@@ -373,45 +373,58 @@ class OpenEdXInstance(LoadBalancedInstance, OpenEdXAppConfiguration, OpenEdXData
         return self.ref.openedxappserver_set
 
     @log_exception
-    def spawn_appserver(self):
+    def spawn_appserver(self, mark_active_on_success=False, num_attempts=2):
         """
-        Provision a new AppServer.
+        Provision a new AppServer
 
         Returns the ID of the new AppServer on success or None on failure.
         """
-        if not self.load_balancing_server:
-            self.load_balancing_server = LoadBalancingServer.objects.select_random()
-            self.save()
-            self.reconfigure_load_balancer()
+        success = False
 
-        # We unconditionally set the DNS records here, though this would only be strictly needed
-        # when the first AppServer is spawned.  However, there is no easy way to tell whether the
-        # DNS records have already been successfully set, and it doesn't hurt to alway do it.
-        self.set_dns_records()
+        for i in range(1, num_attempts + 1):
+            if not self.load_balancing_server:
+                self.load_balancing_server = LoadBalancingServer.objects.select_random()
+                self.save()
+                self.reconfigure_load_balancer()
 
-        # Provision external databases:
-        if not self.use_ephemeral_databases:
-            # TODO: Use db row-level locking to ensure we don't get any race conditions when creating these DBs.
-            # Use select_for_update(nowait=True) to lock this object's row, then do these steps, then refresh_from_db
-            self.logger.info('Provisioning MySQL database...')
-            self.provision_mysql()
-            self.logger.info('Provisioning MongoDB databases...')
-            self.provision_mongo()
-            self.logger.info('Provisioning Swift container...')
-            self.provision_swift()
-            self.logger.info('Provisioning RabbitMQ vhost...')
-            self.provision_rabbitmq()
+            # We unconditionally set the DNS records here, though this would only be strictly needed
+            # when the first AppServer is spawned.  However, there is no easy way to tell whether the
+            # DNS records have already been successfully set, and it doesn't hurt to alway do it.
+            self.set_dns_records()
 
-        app_server = self._create_owned_appserver()
+            # Provision external databases:
+            if not self.use_ephemeral_databases:
+                # TODO: Use db row-level locking to ensure we don't get any race conditions when creating
+                # these DBs. Use select_for_update(nowait=True) to lock this object's row, then do these
+                # steps, then refresh_from_db
+                self.logger.info('Provisioning MySQL database...')
+                self.provision_mysql()
+                self.logger.info('Provisioning MongoDB databases...')
+                self.provision_mongo()
+                self.logger.info('Provisioning Swift container...')
+                self.provision_swift()
+                self.logger.info('Provisioning RabbitMQ vhost...')
+                self.provision_rabbitmq()
 
-        if app_server.provision():
+            self.logger.info('Spawning new AppServer, attempt %d of %d', i, num_attempts)
+            app_server = self._create_owned_appserver()
+
+            if app_server.provision():
+                success = True
+                break
+            else:
+                self.logger.error('Failed to provision new app server')
+
+        if success:
             self.logger.info('Provisioned new app server, %s', app_server.name)
             self.successfully_provisioned = True
             self.save()
+
+            if mark_active_on_success:
+                app_server.make_active()
+
             return app_server.pk
-        else:
-            self.logger.error('Failed to provision new app server')
-            return None
+
 
     def _create_owned_appserver(self):
         """

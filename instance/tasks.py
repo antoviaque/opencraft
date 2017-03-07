@@ -50,18 +50,10 @@ def spawn_appserver(instance_ref_id, mark_active_on_success=False, num_attempts=
     Optionally mark the new AppServer as active when the provisioning completes.
     Optionally retry up to 'num_attempts' times
     """
-    for i in range(1, num_attempts + 1):
-        logger.info('Retrieving instance: ID=%s', instance_ref_id)
-        # Fetch the instance inside the loop, in case it has been updated
-        instance = OpenEdXInstance.objects.get(ref_set__pk=instance_ref_id)
+    logger.info('Retrieving instance: ID=%s', instance_ref_id)
+    instance = OpenEdXInstance.objects.get(ref_set__pk=instance_ref_id)
 
-        instance.logger.info('Spawning new AppServer, attempt %d of %d', i, num_attempts)
-        appserver_id = instance.spawn_appserver()
-        if appserver_id:
-            if mark_active_on_success:
-                # If the AppServer provisioned successfully, make it active.
-                appserver_make_active(appserver_id)
-            break
+    instance.spawn_appserver(mark_active_on_success=mark_active_on_success, num_attempts=num_attempts)
 
 
 @db_task()
