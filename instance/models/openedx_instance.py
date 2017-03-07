@@ -34,6 +34,7 @@ from django.utils.text import slugify
 from django_extensions.db.fields.json import JSONField
 
 from instance.logging import log_exception
+from instance.signals import appserver_spawned
 from instance.models.appserver import Status as AppServerStatus
 from instance.models.instance import Instance
 from instance.models.load_balancer import LoadBalancingServer
@@ -423,7 +424,11 @@ class OpenEdXInstance(LoadBalancedInstance, OpenEdXAppConfiguration, OpenEdXData
             if mark_active_on_success:
                 app_server.make_active()
 
+            appserver_spawned.send(sender=self.__class__, instance=self, app_server=app_server)
+
             return app_server.pk
+        else:
+            appserver_spawned.send(sender=self.__class__, instance=self, appserver=None)
 
 
     def _create_owned_appserver(self):
