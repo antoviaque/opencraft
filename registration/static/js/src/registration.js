@@ -59,6 +59,35 @@ app.controller('Registration', ['$scope', '$http', 'djangoForm', function($scope
         'password_confirmation'
     ];
 
+    // Stripe
+    // TODO: Move key to config
+    var stripeHandler = StripeCheckout.configure({
+        key: 'pk_test_dXfAk69u10kOnoAErjfMOSDC',
+        name: "Open edX Hosting",
+        token: function(token, args) {
+            console.log("Got stripe token: " + token.id);
+        }
+    });
+
+    // TODO: Move price to config
+    $scope.doCheckout = function() {
+        var options = {
+            description: "1x Starter Instance (monthly)",
+            billingAddress: true,
+            amount: 9500,
+            currency: 'EUR',
+            email: $scope.form['email'].$viewValue
+        };
+        stripeHandler.open(options);
+    };
+
+    // Automatically launch the checkout upon successful processing the form
+    angular.element(document).ready(function () {
+        if ($scope.form['pk'].$viewValue) {
+            $scope.doCheckout();
+        }
+    });
+
     // Returns a list of all form fields.
     var getFormFields = function() {
         return _.keys($scope.form).filter(function(key) {

@@ -29,6 +29,7 @@
                 {% include row with field=form.password %}
                 {% include row with field=form.password_confirmation %}
             {% endif %}
+            {% include "registration/form_creditcard.html" %}
             {% include row with field=form.project_description %}
         {% endwith %}
         {% with row="registration/form_checkbox_field.html" %}
@@ -36,6 +37,9 @@
             {% include row with field=form.subscribe_to_updates %}
         {% endwith %}
         {% with field=form.password_strength %}
+            {{ field }}
+        {% endwith %}
+        {% with field=form.pk %}
             {{ field }}
         {% endwith %}
         <div class="page-content__wrapper__stroke hidden-xs"></div>

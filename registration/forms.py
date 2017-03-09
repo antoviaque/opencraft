@@ -107,6 +107,11 @@ class BetaTestApplicationForm(NgModelFormMixin, NgFormValidationMixin, NgModelFo
         'subscribe_to_updates',
     }
 
+    pk = forms.IntegerField(
+        widget=forms.HiddenInput,
+        required=False,
+        disabled=True,
+    )
     full_name = forms.CharField(
         max_length=255,
         widget=TextInput,
@@ -190,6 +195,8 @@ class BetaTestApplicationForm(NgModelFormMixin, NgFormValidationMixin, NgModelFo
         super().__init__(*args, **kwargs)
         if self.instance:
             if hasattr(self.instance, 'user'):
+                self.initial['pk'] = self.instance.pk
+
                 # Populate the username and email fields and make them read only
                 for field in ('username', 'email'):
                     self.initial[field] = getattr(self.instance.user, field)

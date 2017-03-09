@@ -1,0 +1,17 @@
+{% if application.pk %}
+<div class="page-content__inner__wrapper">
+    <div class="page-content__inner__left">
+        <div class="field field--host">
+            <div class="field-label field-label--required">
+                Payment method
+            </div>
+            <div class="input--host__wrapper input--host__wrapper--creditcard">
+                <button type="button" ng-click="doCheckout()" class="btn btn--cyan-light-moderate color-white background-cyan-light-moderate">Set credit card</button>
+            </div>
+        </div>
+    </div>
+    <div class="page-content__inner__right">
+        <p class="color-gray-dark">The credit card that will be charged monthly.</p>
+    </div>
+</div>
+{% endif %}
