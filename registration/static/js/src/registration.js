@@ -34,19 +34,30 @@ $(document).ready(function() {
 
 // App configuration //////////////////////////////////////////////////////////
 
-var app = angular.module('RegistrationApp', ['djng.forms']);
+var app = angular.module('RegistrationApp', ['djng.forms', 'restangular']);
 
-app.config(function($httpProvider) {
+app.config(function($httpProvider, RestangularProvider) {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+    RestangularProvider.setRequestSuffix('/');
+});
+
+
+// Services ///////////////////////////////////////////////////////////////////
+
+app.factory('OpenCraftAPI', function(Restangular) {
+    return Restangular.withConfig(function(RestangularConfigurer) {
+        RestangularConfigurer.setBaseUrl('/api/v1');
+    });
 });
 
 
 // Controllers ////////////////////////////////////////////////////////////////
 
-app.controller('Registration', ['$scope', '$http', 'djangoForm',
-    function($scope, $http, djangoForm) {
+app.controller('Registration', ['$scope', '$http', 'djangoForm', 'OpenCraftAPI',
+    function($scope, $http, djangoForm, OpenCraftAPI) {
 
         var stripeHandler;
 
@@ -91,8 +102,11 @@ app.controller('Registration', ['$scope', '$http', 'djangoForm',
                 name: "Open edX Hosting",
                 token: function(token, args) {
                     console.log("Got stripe token: " + token.id);
+                    $scope.setStripeToken(token);
                 }
             });
+
+            $scope.updateBillingCustomer();
 
             // Automatically launch the checkout upon successful processing the form
             angular.element(document).ready(function () {
@@ -102,8 +116,8 @@ app.controller('Registration', ['$scope', '$http', 'djangoForm',
             });
         };
 
-        // TODO: Move price to config
         $scope.doCheckout = function() {
+            // TODO: Move price to config
             var options = {
                 description: "1x Starter Instance (monthly)",
                 billingAddress: true,
@@ -112,6 +126,28 @@ app.controller('Registration', ['$scope', '$http', 'djangoForm',
                 email: $scope.form['email'].$viewValue
             };
             stripeHandler.open(options);
+        };
+
+        $scope.updateBillingCustomer = function() {
+            return OpenCraftAPI.all("billing/customer").getList().then(function(billingCustomerList) {
+                $scope.billingCustomer = billingCustomerList[0];
+                console.log('Updated BillingCustomer:', $scope.billingCustomer);
+            }, function(response) {
+                console.error('Error from server: ', response);
+            });
+        };
+
+        $scope.setStripeToken = function(token) {
+            OpenCraftAPI.all("billing/customer").post({stripe_token: token.id}).then(
+                function(billingCustomer) {
+                    $scope.billingCustomer = billingCustomer;
+                    console.log('Updated BillingCustomer:', $scope.billingCustomer);
+                    // TODO: Warn user in the UI
+                }, function(response) {
+                    console.error('Error from server: ', response);
+                    // TODO: Warn user in the UI
+                }
+            );
         };
 
         // Returns a list of all form fields.
