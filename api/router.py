@@ -24,6 +24,7 @@ REST Framework API - Router
 
 from rest_framework import routers
 
+from billing.api import BillingCustomerViewSet
 from instance.api.instance import InstanceViewSet
 from instance.api.openedx_appserver import OpenEdXAppServerViewSet
 from instance.api.server import OpenStackServerViewSet
@@ -35,6 +36,7 @@ from pr_watch.api import WatchedPullRequestViewSet
 
 router = routers.DefaultRouter()
 
+router.register(r'billing/customer', BillingCustomerViewSet, base_name='customer')
 router.register(r'instance', InstanceViewSet, base_name='instance')
 router.register(r'openedx_appserver', OpenEdXAppServerViewSet)
 router.register(r'openstackserver', OpenStackServerViewSet)

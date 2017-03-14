@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2015-2016 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -17,30 +17,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 """
-Models for the billing application
+Billing serializers (API representation)
 """
 
 # Imports #####################################################################
 
-from django.conf import settings
-from django.db import models
-from django_extensions.db.models import TimeStampedModel
+from rest_framework import serializers
 
-from instance.models.utils import ValidateModelMixin
+from billing.models import BillingCustomer
 
 
-# Models ######################################################################
+# Serializers #################################################################
 
-class BillingCustomer(ValidateModelMixin, TimeStampedModel):
+class BillingCustomerSerializer(serializers.ModelSerializer):
     """
-    A billing representation of a user
+    Serializer for BillingCustomer
     """
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='billing_customer',
-    )
-    stripe_customer_id = models.CharField(
-        max_length=50,
-        help_text=('The id of the customer recorded in Stripe for this user.'),
-    )
+    class Meta:
+        model = BillingCustomer
+        fields = (
+            'id',
+            'stripe_customer_id',
+        )

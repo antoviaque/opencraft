@@ -77,7 +77,8 @@ LOCAL_APPS = (
     'pr_watch',
     'userprofile',
     'registration',
-    'backup_swift'
+    'backup_swift',
+    'billing',
 )
 
 INSTALLED_APPS = (
@@ -555,3 +556,9 @@ DEFAULT_LOAD_BALANCING_SERVER = env('DEFAULT_LOAD_BALANCING_SERVER', default=Non
 
 LOAD_BALANCER_FRAGMENT_NAME_PREFIX = env('LOAD_BALANCER_FRAGMENT_NAME_PREFIX', default='opencraft-')
 PRELIMINARY_PAGE_SERVER_IP = env('PRELIMINARY_PAGE_SERVER_IP', default=None)
+
+
+# Billing #####################################################################
+
+STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY', default=None)
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY', default=None)
