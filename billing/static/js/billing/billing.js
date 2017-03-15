@@ -48,25 +48,23 @@ app.controller('PaymentMethodSelection', ['$scope', '$attrs', 'OpenCraftAPI',
         };
 
         $scope.init_stripe = function() {
-            // TODO: Move key to config
-            stripeHandler = StripeCheckout.configure({
-                key: 'pk_test_dXfAk69u10kOnoAErjfMOSDC',
-                name: "Open edX Hosting",
-                token: function(token, args) {
-                    console.log("Got stripe token: " + token.id);
-                    $scope.setStripeToken(token);
-                }
-            });
+            $scope.updateBillingCustomer().then(function() {
+                stripeHandler = StripeCheckout.configure({
+                    key: $scope.billingCustomer.stripe_public_key,
+                    name: "Open edX Hosting",
+                    token: function(token, args) {
+                        console.log("Got stripe token: " + token.id);
+                        $scope.setStripeToken(token);
+                    }
+                })
 
-            $scope.updateBillingCustomer();
-
-            // Automatically launch the checkout if the "oc-autoload" attribute on the controller
-            // HTML node evaluates to true
-            angular.element(document).ready(function () {
-                console.log($attrs);
-                if ($attrs.ocAutoload && $scope.$eval($attrs.ocAutoload)) {
-                    $scope.doCheckout();
-                }
+                // Automatically launch the checkout if the "oc-autoload" attribute on the controller
+                // HTML node evaluates to true
+                angular.element(document).ready(function () {
+                    if ($attrs.ocAutoload && $scope.$eval($attrs.ocAutoload)) {
+                        $scope.doCheckout();
+                    }
+                });
             });
         };
 

@@ -22,6 +22,7 @@ Billing serializers (API representation)
 
 # Imports #####################################################################
 
+from django.conf import settings
 from rest_framework import serializers
 
 from billing.models import BillingCustomer
@@ -39,3 +40,11 @@ class BillingCustomerSerializer(serializers.ModelSerializer):
             'id',
             'stripe_customer_id',
         )
+
+    def to_representation(self, obj):
+        """
+        Add additional fields/data to the output
+        """
+        output = super().to_representation(obj)
+        output['stripe_public_key'] = settings.STRIPE_PUBLIC_KEY
+        return output
