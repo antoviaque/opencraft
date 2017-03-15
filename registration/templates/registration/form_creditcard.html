@@ -1,6 +1,9 @@
 {% load staticfiles %}
 
 <div class="page-content__inner__wrapper"
+     ng-if="form['pk'].$viewValue"
+     ng-controller="PaymentMethodSelection"
      ng-include="'{% static 'html/billing/form_creditcard.html' %}'"
-     ng-if="form['pk'].$viewValue">
+     oc-autoload="form['pk'].$viewValue"
+     oc-email="form['email'].$viewValue">
 </div>
