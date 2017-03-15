@@ -58,10 +58,9 @@ app.controller('PaymentMethodSelection', ['$scope', '$attrs', 'OpenCraftAPI',
                     }
                 })
 
-                // Automatically launch the checkout if the "oc-autoload" attribute on the controller
-                // HTML node evaluates to true
+                // Automatically launch the checkout if we don't have a card recorded
                 angular.element(document).ready(function () {
-                    if ($attrs.ocAutoload && $scope.$eval($attrs.ocAutoload)) {
+                    if (!$scope.billingCustomer.stripe_customer_id) {
                         $scope.doCheckout();
                     }
                 });
