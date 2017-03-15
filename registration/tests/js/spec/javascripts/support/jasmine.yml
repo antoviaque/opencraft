@@ -18,7 +18,7 @@ src_files:
   - static/external/js/django-angular.min.js
   - static/external/js/icheck.min.js
   - static/external/js/angular-mocks.js
-  - registration/static/js/src/*.js
+  - registration/static/js/registration/*.js
 
 # stylesheets
 #

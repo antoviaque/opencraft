@@ -9,7 +9,7 @@
 
 describe('JSHint', function () {
     var options = {curly: true, white: true, indent: 2},
-    files = /^.*\/js\/src\/.*\.js$/;
+    files = /^.*\/js\/.*\/.*\.js$/;
 
     _.each(document.getElementsByTagName('script'), function (element) {
         var script = element.getAttribute('src');
