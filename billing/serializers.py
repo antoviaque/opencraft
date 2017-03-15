@@ -47,4 +47,5 @@ class BillingCustomerSerializer(serializers.ModelSerializer):
         """
         output = super().to_representation(obj)
         output['stripe_public_key'] = settings.STRIPE_PUBLIC_KEY
+        output['instance_base_monthly_price'] = settings.INSTANCE_BASE_MONTHLY_PRICE
         return output

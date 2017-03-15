@@ -69,14 +69,22 @@ app.controller('PaymentMethodSelection', ['$scope', '$attrs', 'OpenCraftAPI',
         };
 
         $scope.doCheckout = function() {
-            // TODO: Move price to config
             var options = {
-                description: "1x Starter Instance (monthly)",
                 billingAddress: true,
-                amount: 9500,
+                amount: 0,
                 currency: 'EUR',
                 email: $scope.$eval($attrs.ocEmail)
             };
+
+            if ($scope.billingCustomer.stripe_customer_id) {
+                options.description = 'Update billing information';
+                options.panelLabel = 'Update card';
+            } else {
+                options.description = '1 month of free trial, then ' +
+                                      $scope.billingCustomer.instance_base_monthly_price/100 + '€/month';
+                options.panelLabel = 'Start Free Trial';
+            }
+
             stripeHandler.open(options);
         };
 
