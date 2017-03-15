@@ -4,10 +4,14 @@
             Payment method
         </div>
         <div class="input--host__wrapper input--host__wrapper--creditcard">
-            <button type="button" ng-click="doCheckout()" class="btn btn--cyan-light-moderate color-white background-cyan-light-moderate">
+            <button type="button" ng-click="doCheckout()" class="btn btn--cyan-light-moderate color-white background-cyan-light-moderate" style="margin: 0">
                 {{ billingCustomer.stripe_customer_id ? 'Update' : 'Set'}} credit card
             </button>
         </div>
+        <ul class="djng-field-errors" ng-show="payment.error || payment.success">
+            <li class="invalid" ng-show="payment.error">{{ payment.error }}</li>
+            <li class="valid" ng-show="payment.success"></li>
+        </ul>
     </div>
 </div>
 <div class="page-content__inner__right">

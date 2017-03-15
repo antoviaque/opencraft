@@ -84,6 +84,11 @@ app.controller('PaymentMethodSelection', ['$scope', '$attrs', 'OpenCraftAPI',
                 options.panelLabel = 'Start Free Trial';
             }
 
+            $scope.payment = {
+                success: false,
+                error: false
+            };
+
             stripeHandler.open(options);
         };
 
@@ -101,10 +106,10 @@ app.controller('PaymentMethodSelection', ['$scope', '$attrs', 'OpenCraftAPI',
                 function(billingCustomer) {
                     $scope.billingCustomer = billingCustomer;
                     console.log('Updated BillingCustomer:', $scope.billingCustomer);
-                    // TODO: Warn user in the UI
+                    $scope.payment.success = true;
                 }, function(response) {
                     console.error('Error from server: ', response);
-                    // TODO: Warn user in the UI
+                    $scope.payment.error = 'Payment information could not be updated - contact us.';
                 }
             );
         };
