@@ -19,14 +19,14 @@
 
 // Tests //////////////////////////////////////////////////////////////////////
 
-describe('RegistrationApp', function() {
+describe('OpenCraftApp', function() {
     var $scope,
         httpBackend,
         errors,
         controller;
 
     beforeEach(function() {
-        angular.mock.module('RegistrationApp');
+        angular.mock.module('OpenCraftApp');
     });
 
     describe('Registration controller', function() {

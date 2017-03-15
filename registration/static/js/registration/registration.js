@@ -34,7 +34,7 @@ $(document).ready(function() {
 
 // App configuration //////////////////////////////////////////////////////////
 
-var app = angular.module('RegistrationApp', ['djng.forms', 'restangular']);
+var app = angular.module('OpenCraftApp', ['djng.forms', 'restangular']);
 
 app.config(function($httpProvider, RestangularProvider) {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
